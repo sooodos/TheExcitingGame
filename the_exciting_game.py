@@ -107,19 +107,19 @@ def draw(player: list, deck: list):
         deck.insert(0, card)  # put the card on the bottom of the deck
 
 
-def fix_hand(player1: list) -> list:
+def fix_hand(player: list) -> list:
     new_hand = []
     print("Your current hand is setup like this:")
-    print(player1)
-    for i in range(len(player1)):
+    print(player)
+    for i in range(len(player)):
         replacement_choice = input(f"Choose one of your cards to be on position {i} :")
-        while replacement_choice not in player1:
+        while replacement_choice not in player:
             replacement_choice = input(f"Choose one of your cards to be on position {i} :")
         new_hand.insert(len(new_hand), replacement_choice)
-        player1.remove(replacement_choice)
-        if len(player1) > 0:
+        player.remove(replacement_choice)
+        if len(player) > 0:
             print("Cards remaining in previous hands")
-            print(player1)
+            print(player)
         print("New hand")
         print(new_hand)
         print()
