@@ -36,13 +36,13 @@ def run(circuit: QuantumCircuit):
 
 def place_gate(player, field, qubit):
     card = player.pop()
-    print(f"now inserting card {card} from player {qubit}")
+    print(f"now inserting card {card} from player {qubit+1}")
     if card == "H":
         field.h(qubit)
     elif card == "X":
         field.x(qubit)
     elif card == "RX":
-        field.rx(np.pi / 2, 0)
+        field.rx(np.pi/2, qubit)
     elif card == "CX":
         if qubit == 0:
             field.cx(qubit, qubit + 1)
@@ -139,9 +139,9 @@ class Game:
     current_round = 0
     while current_round <= rounds:
         countdown = 4
-        print("#" * (rounds + 1), end="")
-        print(f"ROUND {rounds + 1}", end="")
-        print("#" * (rounds + 1))
+        print("#" * (current_round + 1), end="")
+        print(f"ROUND {current_round}", end="")
+        print("#" * (current_round + 1))
         print()
         deal_starting_hands(player1, player2, deck)
         while countdown != 0:
