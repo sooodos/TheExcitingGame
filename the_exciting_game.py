@@ -1,7 +1,10 @@
 from random import randint
-from qiskit import QuantumCircuit, BasicAer, execute
 
-cards = ["H", "H", "X", "X", "CX", "SX", "SXDG"]
+import numpy as np
+from qiskit import execute, BasicAer
+from qiskit.circuit.quantumcircuit import QuantumCircuit
+
+cards = ["H", "H", "X", "X", "CX", "RX", "RX"]
 
 
 def run(circuit: QuantumCircuit):
@@ -38,16 +41,12 @@ def place_gate(player, field, qubit):
         field.h(qubit)
     elif card == "X":
         field.x(qubit)
-    elif card == "SX":
-        field.sx(qubit)
-    elif card == "SXdg":
-        field.sxdg(qubit)
+    elif card == "RX":
+        field.rx(np.pi / 2, 0)
     elif card == "CX":
         if qubit == 0:
-            # print(f"It seems that player {qubit + 1} sabotaged player {qubit + 2} with a C-NOT gate!")
             field.cx(qubit, qubit + 1)
         else:
-            # print(f"It seems that player {qubit+1} sabotaged player {qubit} with a C-NOT gate!")
             field.cx(qubit, qubit - 1)
 
 
@@ -55,8 +54,9 @@ def create_playing_field(player1: list, player2: list) -> QuantumCircuit:
     field = QuantumCircuit(2, 2)
     player1.reverse()
     player2.reverse()
-    for i in range(5):
+    while len(player1) > 0:
         place_gate(player1, field, 0)
+    while len(player2) > 0:
         place_gate(player2, field, 1)
     field.measure(0, 0)
     field.measure(1, 1)
@@ -81,7 +81,7 @@ def shuffle_deck(deck: list):
 
 
 def deal_starting_hands(player1: list, player2: list, deck: list):
-    for i in range(0, 10, 2):
+    for i in range(0, 4, 2):
         player1.append(deck.pop())
         player2.append(deck.pop())
 
@@ -102,10 +102,7 @@ def draw(player: list, deck: list):
     while user_choice != "y" and user_choice != "n":
         user_choice = input("Do you want this card? (y/n)")
     if user_choice == "y":
-        replacement_choice = input("Choose one of your cards to remove:")
-        while replacement_choice not in deck:
-            replacement_choice = input("Choose one of your cards to remove:")
-        replace(replacement_choice, card, player)
+        player.append(card)
     else:
         deck.insert(0, card)  # put the card on the bottom of the deck
 
@@ -117,13 +114,15 @@ def fix_hand(player1: list) -> list:
     for i in range(len(player1)):
         replacement_choice = input(f"Choose one of your cards to be on position {i} :")
         while replacement_choice not in player1:
-            replacement_choice = input("Choose one of your cards to remove:")
+            replacement_choice = input(f"Choose one of your cards to be on position {i} :")
         new_hand.insert(len(new_hand), replacement_choice)
         player1.remove(replacement_choice)
-        print("Cards remaining in previous hands")
-        print(player1)
+        if len(player1) > 0:
+            print("Cards remaining in previous hands")
+            print(player1)
         print("New hand")
         print(new_hand)
+        print()
     return new_hand
 
 
@@ -134,30 +133,41 @@ class Game:
     player1_wins = 0
     player2 = []
     player2_wins = 0
-    rounds = 0
+    rounds = int(input("Enter number of rounds: "))
+
     print("The exciting game begins!")
-    while rounds <= 0:
+    current_round = 0
+    while current_round <= rounds:
+        countdown = 4
         print("#" * (rounds + 1), end="")
         print(f"ROUND {rounds + 1}", end="")
         print("#" * (rounds + 1))
         print()
         deal_starting_hands(player1, player2, deck)
-        print("Player 1")
-        print(player1)
-        draw(player1, deck)
+        while countdown != 0:
+            print("\nPlayer 1")
+            print(player1)
+            draw(player1, deck)
+            print("\nPlayer 2")
+            print(player2)
+            draw(player2, deck)
+            countdown = countdown - 1
+            print(f"{countdown} dealings remain before the players have to see who's Excited!")
+            if countdown == 0:
+                print("Next turn is going to be Exciting!!!")
+
+        print("Both players get to fix their hands in the order they desire!")
         player1 = fix_hand(player1)
-        print("Player 2")
-        print(player2)
-        draw(player2, deck)
         player2 = fix_hand(player2)
         playing_field = create_playing_field(player1, player2)
-        print(playing_field)
+        print(playing_field.draw())
         round_result = run(playing_field)
         if round_result == "1":
             player1_wins = player1_wins + 1
         elif round_result == "2":
             player2_wins = player2_wins + 1
-        rounds = rounds + 1
+        current_round = current_round + 1
+
     if player1_wins > player2_wins:
         print("PLAYER ONE WAS MOST EXCITED!")
     elif player2_wins > player1_wins:
