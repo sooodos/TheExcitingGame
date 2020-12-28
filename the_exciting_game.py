@@ -109,6 +109,7 @@ def draw(player: list, deck: list):
         player.append(card)
     else:
         deck.insert(0, card)  # put the card on the bottom of the deck
+    return
 
 
 def fix_hand(player: list) -> list:
