@@ -48,6 +48,7 @@ def place_gate(player, field, qubit):
             field.cx(qubit, qubit + 1)
         else:
             field.cx(qubit, qubit - 1)
+    return
 
 
 def create_playing_field(player1: list, player2: list) -> QuantumCircuit:
@@ -78,12 +79,14 @@ def shuffle_deck(deck: list):
         temp = deck[j]
         deck[j] = deck[k]
         deck[k] = temp
+    return
 
 
 def deal_starting_hands(player1: list, player2: list, deck: list):
     for i in range(0, 4, 2):
         player1.append(deck.pop())
         player2.append(deck.pop())
+    return
 
 
 def draw_from_deck(deck: list) -> str:
@@ -93,6 +96,7 @@ def draw_from_deck(deck: list) -> str:
 def replace(replacement_choice, card, player):
     player.remove(replacement_choice)
     player.append(card)
+    return
 
 
 def draw(player: list, deck: list):
