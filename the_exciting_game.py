@@ -111,18 +111,20 @@ def fix_hand(player: list) -> list:
     new_hand = []
     print("Your current hand is setup like this:")
     print(player)
-    for i in range(len(player)):
+    i = 0
+    while len(player) > 0:
         replacement_choice = input(f"Choose one of your cards to be on position {i} :")
         while replacement_choice not in player:
             replacement_choice = input(f"Choose one of your cards to be on position {i} :")
         new_hand.insert(len(new_hand), replacement_choice)
         player.remove(replacement_choice)
-        if len(player) > 0:
-            print("Cards remaining in previous hands")
-            print(player)
-        print("New hand")
-        print(new_hand)
-        print()
+        print("Cards remaining in previous hands")
+        print(player)
+        i = i + 1
+
+    print("New hand")
+    print(new_hand)
+    print()
     return new_hand
 
 
